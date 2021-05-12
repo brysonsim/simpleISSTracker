@@ -47,6 +47,7 @@ public class IssTracker {
             System.out.println(json.get("iss_position"));
 
             //Ignore this this is iteration of JSON objects
+            
             /*JSONObject test = json.getJSONObject("iss_position");
             Iterator<String> keys = test.keys();
 

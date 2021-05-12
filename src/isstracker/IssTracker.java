@@ -5,6 +5,7 @@
  */
 package isstracker;
 
+import java.util.Map;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,6 +23,8 @@ import org.json.JSONObject;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Iterator;
+import org.json.JSONArray;
 
 /**
  *
@@ -30,19 +33,31 @@ import java.util.Date;
 public class IssTracker {
 
     /**
-     * Driver for the application
-     * Request information from the website
+     * Driver for the application Request information from the website
+     *
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         try {
             //url reading from (returns the iss position)
             JSONObject json = readFromUrl("http://api.open-notify.org/iss-now.json");
-            
+
             Timestamp ts = new Timestamp(json.getInt("timestamp"));
-           
+
             System.out.println(json.get("iss_position"));
 
+            //Ignore this this is iteration of JSON objects
+            /*JSONObject test = json.getJSONObject("iss_position");
+            Iterator<String> keys = test.keys();
+
+            while (keys.hasNext()) {
+                String key = keys.next();
+                if (test.get(key) instanceof String) {
+                    // do something with jsonObject here 
+                    System.out.println(test.get(key));
+                    
+                }
+            }*/
         } catch (IOException ex) {
             Logger.getLogger(IssTracker.class.getName()).log(Level.SEVERE, null, ex);
         } catch (JSONException ex) {
@@ -62,16 +77,18 @@ public class IssTracker {
     public static JSONObject readFromUrl(String url) throws IOException, JSONException {
         InputStream web = new URL(url).openStream();
         try {
+
             BufferedReader br = new BufferedReader(new InputStreamReader(web, Charset.forName("UTF-8")));
             String jsonText = read(br);
             JSONObject json = new JSONObject(jsonText);
+
             return json;
 
         } finally {
             web.close();
         }
     }
-
+    //build the response
     private static String read(Reader rd) throws IOException {
         StringBuilder sb = new StringBuilder();
         int c;

@@ -5,14 +5,27 @@
  */
 package isstracker;
 
+import java.awt.Image;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import javax.imageio.ImageIO;
+import java.net.URL;
+import javax.swing.ImageIcon;
+
 /**
  *
  * @author bryson
  */
 public class ISSTrackUI extends javax.swing.JFrame {
 
+    //Please make sure to use your own key gained from google cloud and enabling maps api
+    private String googleKey = "google key";
+    private double longi;
+    private double lat;
+
     /**
-     * Creates new form ISSTrackUI
+     * Initializes the jFrame and updates the components with the information
+     * gained from the json objects
      */
     public ISSTrackUI() {
         initComponents();
@@ -32,7 +45,8 @@ public class ISSTrackUI extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabelLong = new javax.swing.JLabel();
         jLabelLat = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        jButtonRefresh = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -45,10 +59,10 @@ public class ISSTrackUI extends javax.swing.JFrame {
 
         jLabelLat.setText("LAT");
 
-        jButton1.setText("Refresh");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jButtonRefresh.setText("Refresh");
+        jButtonRefresh.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jButtonRefreshActionPerformed(evt);
             }
         });
 
@@ -57,30 +71,44 @@ public class ISSTrackUI extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(28, 28, 28)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
-                .addGap(69, 69, 69)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1)
-                    .addComponent(jLabelLat)
-                    .addComponent(jLabelLong))
-                .addContainerGap(171, Short.MAX_VALUE))
+                .addGap(25, 25, 25)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButtonRefresh)
+                        .addGap(86, 86, 86))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel1))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabelLat)
+                            .addComponent(jLabelLong))
+                        .addGap(60, 60, 60)))
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 352, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(85, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(36, 36, 36)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabelLong, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabelLat))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 186, Short.MAX_VALUE)
-                .addComponent(jButton1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(36, 36, 36)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(33, 33, 33)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel1)
+                                    .addComponent(jLabelLong, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabel2)
+                                .addComponent(jLabelLat)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(46, 46, 46)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)))
+                .addComponent(jButtonRefresh)
                 .addContainerGap())
         );
 
@@ -89,10 +117,10 @@ public class ISSTrackUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+    private void jButtonRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRefreshActionPerformed
+        //refresh the data
         update();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButtonRefreshActionPerformed
 
     /**
      * @param args the command line arguments
@@ -123,23 +151,62 @@ public class ISSTrackUI extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new ISSTrackUI().setVisible(true);
             }
         });
     }
 
-    public void update() {
-        IssTracker tracker = new IssTracker();
+    //this just calls the other json update and replaces whats in the frame already
+    private void update() {
+        JSONCaller tracker = new JSONCaller();
         tracker.update();
-        jLabelLong.setText(String.valueOf(tracker.getLongi()));
-        jLabelLat.setText(String.valueOf(tracker.getLati()));
 
+        longi = tracker.getLongi();
+        lat = tracker.getLati();
+
+        jLabelLong.setText(String.valueOf(longi));
+        jLabelLat.setText(String.valueOf(lat));
+
+        try {
+            Image goMap = ImageIO.read(urlBuilder());
+            jLabel3.setIcon(new ImageIcon(goMap));
+            jLabel3.repaint(); //idk if this is actually useful I just put it incase might remove in future
+        } catch (MalformedURLException mex) {
+            System.out.println(mex.getMessage() + " \nSomething within the complete url is wrong please check again ");
+        } catch (IOException e) {
+            System.out.println("error occurred fetching map " + e.getMessage());
+        }
     }
+
+    /**
+     * build what the map looks like I though about having the map zoomed out to
+     * see the whole earth and just have the marker move
+     * you can achieve this by removing the center and zooming out the map
+     */
+    private URL urlBuilder() throws MalformedURLException {
+        URL url;
+        //build a new map the size of the label to fit properly
+        //center: used to center the map on the iss
+        //zoom: zoomed out slightly to see area
+        //marker: the color of the marker to pin point the location (label can also be changed to show a letter)
+        //maptype: remove for default, currently set to satellite to see detail
+        String urlComplete = ("https://maps.googleapis.com/maps/api/staticmap?center="
+                + String.valueOf(longi) + "," + String.valueOf(lat)
+                + "&size=" + jLabel3.getWidth() + "x" + jLabel3.getHeight() + "&zoom=3&markers=color:red%7Clabel:ISS%7C"
+                + String.valueOf(longi) + "," + String.valueOf(lat)
+                + "&maptype=satellite&key=" + googleKey);
+        //create a useable url
+        url = new URL(urlComplete);
+        return url;
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButtonRefresh;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabelLat;
     private javax.swing.JLabel jLabelLong;
     // End of variables declaration//GEN-END:variables

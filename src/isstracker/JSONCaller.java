@@ -98,15 +98,3 @@ public class JSONCaller {
     }
 
 }
-//Ignore this this is iteration of JSON objects that I used for testing
-/*JSONObject test = json.getJSONObject("iss_position");
-            Iterator<String> keys = test.keys();
-
-            while (keys.hasNext()) {
-            String key = keys.next();
-            if (test.get(key) instanceof String) {
-            // do something with jsonObject here
-            System.out.println(test.get(key));
-            
-            }
-            }*/
